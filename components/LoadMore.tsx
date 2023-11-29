@@ -14,16 +14,27 @@ function LoadMore() {
   const { ref, inView } = useInView();
 
   const [data, setData] = useState<AnimeCard[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (inView) {
-      fetchAnime(page).then((res) => {
-        setData([...data, ...res]);
-        page++;
-      });
+      setIsLoading(true);
+      // Add a delay of 500 milliseconds
+      const delay = 500;
+
+      const timeoutId = setTimeout(() => {
+        fetchAnime(page).then((res) => {
+          setData([...data, ...res]);
+          page++;
+        });
+
+        setIsLoading(false);
+      }, delay);
+
+      // Clear the timeout if the component is unmounted or inView becomes false
+      return () => clearTimeout(timeoutId);
     }
-  }, [inView]);
+  }, [inView, data, isLoading]);
 
   return (
     <>
